@@ -149,11 +149,24 @@ function start(){playing=true;towers.forEach(t=>t.el?.remove());enemies.forEach(
   path.splice(0,path.length,[3.8,3],[16.3,3],[16.3,19.7],[16.3,36.4],[28.8,36.4],[41.3,36.4],[53.8,36.4],[66.3,36.4],[66.3,19.7],[66.3,3],[78.8,3],[91.3,3],[91.3,19.7],[91.3,36.4],[91.3,53.1],[78.8,53.1],[66.3,53.1],[53.8,53.1],[53.8,69.7],[53.8,86.4],[47.5,90]);
   document.querySelectorAll('.grid').forEach(g=>[...g.children].forEach((c,i)=>c.classList.toggle('roadcell',roadCells.has(i))));
   resetLocks=function(){
-    initialOpen.clear();
-    const candidates=[...Array(48).keys()].filter(i=>!roadCells.has(i));
-    for(let n=0;n<6&&candidates.length;n++)initialOpen.add(candidates.splice(Math.floor(Math.random()*candidates.length),1)[0]);
-    document.querySelectorAll('#myGrid .cell').forEach((c,i)=>c.classList.toggle('locked',!roadCells.has(i)&&!initialOpen.has(i)));
-    document.querySelectorAll('#enemyGrid .cell').forEach((c,i)=>c.classList.toggle('locked',!roadCells.has(i)&&!initialOpen.has(i)));
+    const makeOpenCluster=()=>{
+      const usable=[...Array(48).keys()].filter(i=>!roadCells.has(i));
+      for(let attempt=0;attempt<100;attempt++){
+        const open=new Set([usable[Math.floor(Math.random()*usable.length)]]);
+        while(open.size<4){
+          const frontier=[];
+          open.forEach(i=>{const r=Math.floor(i/8),c=i%8;[[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(([nr,nc])=>{const n=nr*8+nc;if(nr>=0&&nr<6&&nc>=0&&nc<8&&!roadCells.has(n)&&!open.has(n))frontier.push(n)})});
+          if(!frontier.length)break;
+          open.add(frontier[Math.floor(Math.random()*frontier.length)]);
+        }
+        if(open.size===4)return open;
+      }
+      return new Set([2,3,10,11].filter(i=>!roadCells.has(i)));
+    };
+    const myOpen=makeOpenCluster(),enemyOpen=makeOpenCluster();
+    initialOpen.clear();myOpen.forEach(i=>initialOpen.add(i));
+    document.querySelectorAll('#myGrid .cell').forEach((c,i)=>c.classList.toggle('locked',!roadCells.has(i)&&!myOpen.has(i)));
+    document.querySelectorAll('#enemyGrid .cell').forEach((c,i)=>c.classList.toggle('locked',!roadCells.has(i)&&!enemyOpen.has(i)));
   };
   botBuild=function(){
     if(botTokens<=0)return;
