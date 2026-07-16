@@ -1,4 +1,5 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>撑住啊阿斗</title><script>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>撑住啊阿斗</title><style>#roomGate{display:none!important}</style><script>
+addEventListener('load',()=>{document.querySelector('#roomGate')?.remove();document.querySelector('#intro')?.classList.remove('hide')});
 addEventListener('DOMContentLoaded',()=>{
   document.title='撑住啊阿斗';document.querySelector('#intro h1').textContent='撑住啊阿斗';
   const fifth=document.createElement('button');fifth.dataset.kind='';fifth.innerHTML='<b>？</b><small>等待刷新</small>';document.querySelector('.hand').insertBefore(fifth,document.querySelector('#recruit'));
